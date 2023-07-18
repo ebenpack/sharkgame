@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      @font-face {
+        font-family: Snowstorm;
+        src: url("./fonts/Snowstorm.woff") format("woff"),
+          url("./fonts/Snowstorm.ttf") format("truetype");
+      }
+
+      html {
+        background: url("./images/page_background.png") no-repeat center center
+          fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+        background-size: cover;
+        image-rendering: -moz-crisp-edges; /* Firefox */
+        image-rendering: -o-crisp-edges; /* Opera */
+        image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard naming) */
+        image-rendering: crisp-edges;
+        -ms-interpolation-mode: nearest-neighbor; /*IE (non-standard property)*/
+        font-family: Snowstorm;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        gap: 20px;
+        height: 100%;
+      "
+      id="shark-game"
+    >
+      <canvas id="canvas" />
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>
