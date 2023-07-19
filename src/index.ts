@@ -208,7 +208,12 @@ const main = async () => {
     cavity: number;
     selected: number | null;
   };
-  type State = SelectCavity | SelectTooth;
+  type Win = {
+    state: "win";
+    cavity: number;
+    selected: number | null;
+  };
+  type State = SelectCavity | SelectTooth | Win;
   let state: State = { state: "select-cavity" };
 
   canvasContainer.addEventListener("click", (e) => {
@@ -238,11 +243,19 @@ const main = async () => {
               drawImg({ ...image, clear: true });
             }
           }
-          state = {
-            state: "select-tooth",
-            cavity: state.cavity,
-            selected: target,
-          };
+          if (target + 1 === state.cavity) {
+            state = {
+              state: "win",
+              cavity: state.cavity,
+              selected: target,
+            };
+          } else {
+            state = {
+              state: "select-tooth",
+              cavity: state.cavity,
+              selected: target,
+            };
+          }
         }
       }
       const instructionsContent = document.getElementById(
@@ -262,6 +275,10 @@ const main = async () => {
           instructionsContent.textContent = `Select the currently played tooth!\nIf it's your turn, then play ${
             rem || 1
           }!`;
+          break;
+        }
+        case "win": {
+          instructionsContent.textContent = `If it's your turn, then you've won!`;
           break;
         }
       }
