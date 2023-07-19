@@ -42,20 +42,23 @@
         
       "
     >
+      <!-- TODO: Maybe grid? The instructions box changes height a bit currently -->
       <div id="shark-game" style="position: relative; flex: 0 0 auto;"></div>
       <div 
         style="
-          color: #15d2fb;
-          font-size: 20px;
+          color: #098ca8;
+          text-shadow: -3px 2px 0px rgba(188,245,124,0.6);
+          font-size: 25px;
           padding:40px;
           background-color:white; 
           flex-shrink: 1;
           flex-wrap: wrap;
-          text-shadow: -3px 2px 0px rgba(188,245,124,0.6);
+          background: rgb(157,252,252);
+          background: linear-gradient(180deg, rgba(157,252,252,1) 35%, rgba(81,196,251,1) 100%);
         "
       >
       <h2>Oh hey, what do I do?</h2>
-      <p id="instructions-content">Select the tooth with the cavity!</p>
+      <p style="white-space: pre-wrap; " id="instructions-content">Select the tooth with the cavity!</p>
     </div>
     </div>
     <script src="js/main.js""></script>

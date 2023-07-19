@@ -21,6 +21,23 @@ type ScaledImageWithImageWithCanvasWithRenderSettings =
     clear?: true;
   };
 
+type Solution = {
+  rem: number;
+  quot: number;
+};
+
+const solve = (cavity: number, remaining: number): Solution => {
+  // Divide the target number minus 1 by 4 and take the remainder
+  // (or modulus, for the math nerds), as well as keeping the quotient handy.
+  // (18-1)/4 is 4 with a remainder of 1. This remainder is important,
+  // but so is the quotient, so keep 1 and 4 in mind.
+  debugger;
+  const target = remaining - cavity - 1;
+  const rem = target % 4;
+  const quot = Math.floor((target - 1) / 4);
+  return { rem, quot };
+};
+
 const main = async () => {
   const scale = 1.5;
   const canvasContainer = document.getElementById("shark-game");
@@ -209,7 +226,7 @@ const main = async () => {
           state = { state: "select-tooth", cavity: target, selected: null };
         } else if (
           target < state.cavity &&
-          (state.selected == null || state.selected > target)
+          (state.selected == null || state.selected < target)
         ) {
           // Hide all teeth up to this one
           for (let i = 1; i <= target; i++) {
@@ -220,6 +237,11 @@ const main = async () => {
               drawImg({ ...image, clear: true });
             }
           }
+          state = {
+            state: "select-tooth",
+            cavity: state.cavity,
+            selected: target,
+          };
         }
       }
       const instructionsContent = document.getElementById(
@@ -231,19 +253,20 @@ const main = async () => {
       switch (state.state) {
         case "select-cavity": {
           instructionsContent.textContent = "Select the tooth with the cavity!";
+          break;
         }
         case "select-tooth": {
-          instructionsContent.textContent =
-            "Select the currently played tooth!";
+          // TODO: Try to always count from the same side.
+          const { rem } = solve(21 - state.cavity, 21 - (state.selected || 0));
+          instructionsContent.textContent = `Select the currently played tooth!\nIf it's your turn, then play ${
+            rem || 1
+          }!`;
+          break;
         }
       }
     }
   });
-  // Show the solution when you click teeth (after cavity)
-  //    a) if you're in a winnning position
-  //    b) if not then play 1
   // Add a reset button
-  // Add some explanatory text: state-dependent
 };
 
 main();

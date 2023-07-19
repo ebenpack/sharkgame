@@ -1,9 +1,16 @@
 const path = require("path");
 
-module.exports = {
+module.exports = (env) => ({
   entry: "./src/index.ts",
-  mode: "production",
+  mode: env.production ? "production" : "development",
   devServer: {
+    devMiddleware: {
+      index: true,
+      mimeTypes: { phtml: "text/html" },
+      publicPath: "/js",
+      serverSideRender: true,
+      writeToDisk: true,
+    },
     hot: true,
     static: {
       directory: path.join(__dirname, "dist"),
@@ -12,6 +19,7 @@ module.exports = {
     compress: true,
     port: 9000,
   },
+  devtool: env.production ? "source-map" : "eval-source-map",
   module: {
     rules: [
       {
@@ -28,4 +36,4 @@ module.exports = {
     filename: "main.js",
     path: path.resolve(__dirname, "dist/js"),
   },
-};
+});
