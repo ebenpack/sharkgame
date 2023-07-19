@@ -1,1 +1,66 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/sharkgame/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="shark game" content="Dave the Diver shark game solver thingy"/><link rel="apple-touch-icon" href="/sharkgame/logo192.png"/><link rel="manifest" href="/sharkgame/manifest.json"/><title>Dave the Diver shark game solver thingy</title><script defer="defer" src="/sharkgame/static/js/main.962c76d1.js"></script><link href="/sharkgame/static/css/main.073c9b0a.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      @font-face {
+        font-family: Snowstorm;
+        src: url("./fonts/Snowstorm.woff") format("woff"),
+          url("./fonts/Snowstorm.ttf") format("truetype");
+      }
+
+      html {
+        background: url("./images/page_background.png") no-repeat center center
+          fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+        background-size: cover;
+        image-rendering: -moz-crisp-edges; /* Firefox */
+        image-rendering: -o-crisp-edges; /* Opera */
+        image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard naming) */
+        image-rendering: crisp-edges;
+        -ms-interpolation-mode: nearest-neighbor; /*IE (non-standard property)*/
+        font-family: Snowstorm;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        gap: 20px;
+        height: 100%;
+        
+      "
+    >
+      <!-- TODO: Maybe grid? The instructions box changes height a bit currently -->
+      <div id="shark-game" style="position: relative; flex: 0 0 auto;"></div>
+      <div 
+        style="
+          color: #098ca8;
+          text-shadow: -3px 2px 0px rgba(188,245,124,0.6);
+          font-size: 25px;
+          padding:40px;
+          background-color:white; 
+          flex-shrink: 1;
+          flex-wrap: wrap;
+          background: rgb(157,252,252);
+          background: linear-gradient(180deg, rgba(157,252,252,1) 35%, rgba(81,196,251,1) 100%);
+        "
+      >
+      <h2>Oh hey, what do I do?</h2>
+      <p style="white-space: pre-wrap; " id="instructions-content">Select the tooth with the cavity!</p>
+    </div>
+    </div>
+    <script src="js/main.js""></script>
+  </body>
+</html>
