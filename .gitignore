@@ -1,1 +1,4 @@
 .DS_Store
+_publish_dir/
+node_modules/
+dist/main.js

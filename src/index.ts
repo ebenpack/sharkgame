@@ -1,7 +1,39 @@
+type Image = {
+  id: string;
+  src: string;
+  width: number;
+  left: number;
+  top: number;
+};
+
+type ScaledImage = Image & { height: number };
+
+type ScaledImageWithImage = ScaledImage & { image: HTMLImageElement };
+
+type ScaledImageWithImageWithCanvas = ScaledImageWithImage & {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+};
+
+type ScaledImageWithImageWithCanvasWithRenderSettings =
+  ScaledImageWithImageWithCanvas & {
+    tint?: { color: string; alpha: number } | null;
+    clear?: true;
+  };
+
 const main = async () => {
   const scale = 1.5;
   const canvasContainer = document.getElementById("shark-game");
-  const hitboxes = {};
+  if (!canvasContainer) {
+    throw new Error("Container not found");
+  }
+  const hitboxes: {
+    ids: Record<string, true>;
+    hitboxes: Record<string, string>;
+  } = {
+    ids: {},
+    hitboxes: {},
+  };
 
   // TODO: DRAWFRAME IS F'N SLOW
   const maxWidth = 390;
@@ -9,7 +41,7 @@ const main = async () => {
   let actualWidth = 0;
   let actualHeight = 0;
 
-  let images = [
+  let images: Image[] = [
     {
       id: "background",
       src: "background.png",
@@ -38,16 +70,18 @@ const main = async () => {
   ];
 
   // Scale everything
-  images = images.map(({ width, height, left, top, ...rest }) => ({
-    width: Math.floor(width * scale),
-    height: Math.floor((maxHeight / maxWidth) * width * scale),
-    left: Math.floor(left * scale),
-    top: Math.floor(top * scale),
-    ...rest,
-  }));
+  const scaledImages: ScaledImage[] = images.map(
+    ({ width, left, top, ...rest }) => ({
+      width: Math.floor(width * scale),
+      height: Math.floor((maxHeight / maxWidth) * width * scale),
+      left: Math.floor(left * scale),
+      top: Math.floor(top * scale),
+      ...rest,
+    })
+  );
 
   // find the largest dimesntions and set the canvas width/height to that
-  images.forEach(({ width, height }) => {
+  scaledImages.forEach(({ width, height }) => {
     if (actualWidth < width) {
       actualWidth = width;
     }
@@ -55,9 +89,11 @@ const main = async () => {
       actualHeight = height;
     }
   });
-  canvasContainer.style = `position: relative; width: ${actualWidth}px; height: ${actualHeight}`;
+  canvasContainer.style.position = "relative";
+  canvasContainer.style.width = `${actualWidth}px`;
+  canvasContainer.style.height = `${actualHeight}px`;
 
-  const makeImg = async (image) => {
+  const makeImg = async (image: ScaledImage): Promise<ScaledImageWithImage> => {
     const { id, src, width, height, left, top } = image;
     const container = document.createElement("div");
     const img = document.createElement("img");
@@ -80,12 +116,15 @@ const main = async () => {
         //   backBufferCtx.drawImage(img, left, top, width, height);
         //   backBufferCtx.drawImage(buffer, 0, 0, buffer.width, buffer.height);
         // } else {
-        if (id.startsWith("tooth") && !hitboxes[id]) {
-          hitboxes[id] = {};
+        if (id.startsWith("tooth") && !hitboxes.ids[id]) {
+          hitboxes.ids[id] = true;
           const pixelFinder = document.createElement("canvas");
           pixelFinder.width = actualWidth;
           pixelFinder.height = actualHeight;
           const pxlCtx = pixelFinder.getContext("2d");
+          if (!pxlCtx) {
+            throw new Error("Something wonky with this context yo");
+          }
           pxlCtx.drawImage(img, left, top, width, height);
           const imgd = pxlCtx.getImageData(0, 0, actualWidth, actualHeight);
           var pix = imgd.data;
@@ -94,7 +133,7 @@ const main = async () => {
             const y = Math.round(i / 4 / actualHeight);
             const alpha = pix[i + 3];
             if (alpha > 20) {
-              hitboxes[id][`${x}-${y}`] = true;
+              hitboxes.hitboxes[`${x}-${y}`] = id;
             }
           }
         }
@@ -104,24 +143,32 @@ const main = async () => {
     });
   };
 
-  images = await Promise.all(images.map(makeImg));
+  const scaledImagesWithImages = await Promise.all(scaledImages.map(makeImg));
 
-  const makeCanvas = (image) => {
+  const makeCanvas = (
+    image: ScaledImageWithImage
+  ): ScaledImageWithImageWithCanvas => {
     const canvas = document.createElement("canvas");
-    canvas.style =
-      "position: absolute; top:0; left:0; background: transparent;";
+    canvas.style.position = "absolute";
+    canvas.style.top = "0";
+    canvas.style.left = "0";
+    canvas.style.background = " transparent";
     canvas.width = actualWidth;
     canvas.height = actualHeight;
     const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("Something wonky with this context yo");
+    }
     ctx.imageSmoothingEnabled = false;
     canvasContainer.appendChild(canvas);
     return { ...image, canvas, ctx };
   };
 
-  images = images.map(makeCanvas);
+  const scaledImagesWithImagesWithCanvases =
+    scaledImagesWithImages.map(makeCanvas);
 
-  const drawImg = (img, { tint = null, clear = false } = {}) => {
-    const { ctx, image, left, top, width, height } = img;
+  const drawImg = (img: ScaledImageWithImageWithCanvasWithRenderSettings) => {
+    const { ctx, image, left, top, width, height, tint = null, clear } = img;
     if (clear) {
       ctx.clearRect(0, 0, actualWidth, actualHeight);
     } else if (tint) {
@@ -130,6 +177,9 @@ const main = async () => {
       backBuffer.width = actualWidth;
       backBuffer.height = actualHeight;
       const btx = backBuffer.getContext("2d");
+      if (!btx) {
+        throw new Error("Something wonky with this context yo");
+      }
       btx.clearRect(0, 0, actualWidth, actualHeight);
       btx.drawImage(image, left, top, width, height);
 
@@ -147,40 +197,39 @@ const main = async () => {
     }
   };
 
-  images.forEach((i) => drawImg(i));
+  scaledImagesWithImagesWithCanvases.forEach((img) => drawImg(img));
 
-  const state = { cavity: null, selected: null };
+  type State = { cavity: number | null; selected: number | null };
+  const state: State = { cavity: null, selected: null };
 
   canvasContainer.addEventListener("click", (e) => {
     const canvasRect = canvasContainer.getBoundingClientRect();
     const x = Math.floor(e.clientX - canvasRect.left);
     const y = Math.floor(e.clientY - canvasRect.top);
-
-    for (const [hitboxId, vals] of Object.entries(hitboxes)) {
-      if (vals[`${x}-${y}`]) {
-        const image = images.find(({ id }) => id === hitboxId);
-        if (image) {
-          const target = parseInt(hitboxId.split("-")[1], 10);
-          if (state.cavity === null) {
-            drawImg(image, { tint: { color: "#F00000", alpha: 0.3 } });
-            state.cavity = target;
-            break;
-          } else if (
-            target < state.cavity &&
-            (state.selected == null || state.selected > target)
-          ) {
-            // Hide all teeth up to this one
-            for (let i = 1; i <= target; i++) {
-              debugger;
-              const image = images.find(({ id }) => id === `tooth-${i}`);
-              console.log(image);
-              if (image) {
-                drawImg(image, { clear: true });
-              }
+    const hitboxId = hitboxes.hitboxes[`${x}-${y}`];
+    if (hitboxId) {
+      const image = scaledImagesWithImagesWithCanvases.find(
+        ({ id }) => id === hitboxId
+      );
+      if (image) {
+        const target = parseInt(hitboxId.split("-")[1], 10);
+        if (state.cavity === null) {
+          drawImg({ ...image, tint: { color: "#F00000", alpha: 0.3 } });
+          state.cavity = target;
+        } else if (
+          target < state.cavity &&
+          (state.selected == null || state.selected > target)
+        ) {
+          // Hide all teeth up to this one
+          for (let i = 1; i <= target; i++) {
+            const image = scaledImagesWithImagesWithCanvases.find(
+              ({ id }) => id === `tooth-${i}`
+            );
+            console.log(image);
+            if (image) {
+              drawImg({ ...image, clear: true });
             }
-            state.step = "done";
           }
-          break;
         }
       }
     }
