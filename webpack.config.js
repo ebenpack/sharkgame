@@ -3,6 +3,15 @@ const path = require("path");
 module.exports = {
   entry: "./src/index.ts",
   mode: "production",
+  devServer: {
+    hot: true,
+    static: {
+      directory: path.join(__dirname, "dist"),
+      watch: true,
+    },
+    compress: true,
+    port: 9000,
+  },
   module: {
     rules: [
       {
@@ -17,6 +26,6 @@ module.exports = {
   },
   output: {
     filename: "main.js",
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "dist/js"),
   },
 };

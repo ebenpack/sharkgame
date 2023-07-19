@@ -35,7 +35,6 @@ const main = async () => {
     hitboxes: {},
   };
 
-  // TODO: DRAWFRAME IS F'N SLOW
   const maxWidth = 390;
   const maxHeight = 404;
   let actualWidth = 0;
@@ -100,22 +99,7 @@ const main = async () => {
     img.src = `images/${src}`;
     container.appendChild(img);
     return new Promise((resolve) => {
-      img.addEventListener("load", (e) => {
-        // if (tint) {
-        //   btx.clearRect(0, 0, buffer.width, buffer.height);
-        //   btx.drawImage(img, left, top, width, height);
-
-        //   // Now we'll multiply a rectangle of your chosen color
-        //   btx.fillStyle = tint;
-        //   btx.globalCompositeOperation = "multiply";
-        //   btx.fillRect(0, 0, buffer.width, buffer.height);
-
-        //   btx.globalAlpha = 0.5;
-        //   btx.globalCompositeOperation = "destination-in";
-        //   btx.drawImage(img, left, top, width, height);
-        //   backBufferCtx.drawImage(img, left, top, width, height);
-        //   backBufferCtx.drawImage(buffer, 0, 0, buffer.width, buffer.height);
-        // } else {
+      const onLoad = (e: Event) => {
         if (id.startsWith("tooth") && !hitboxes.ids[id]) {
           hitboxes.ids[id] = true;
           const pixelFinder = document.createElement("canvas");
@@ -137,9 +121,10 @@ const main = async () => {
             }
           }
         }
-        // }
         resolve({ ...image, image: img });
-      });
+        img.removeEventListener("load", onLoad);
+      };
+      img.addEventListener("load", onLoad);
     });
   };
 
@@ -199,8 +184,14 @@ const main = async () => {
 
   scaledImagesWithImagesWithCanvases.forEach((img) => drawImg(img));
 
-  type State = { cavity: number | null; selected: number | null };
-  const state: State = { cavity: null, selected: null };
+  type SelectCavity = { state: "select-cavity" };
+  type SelectTooth = {
+    state: "select-tooth";
+    cavity: number;
+    selected: number | null;
+  };
+  type State = SelectCavity | SelectTooth;
+  let state: State = { state: "select-cavity" };
 
   canvasContainer.addEventListener("click", (e) => {
     const canvasRect = canvasContainer.getBoundingClientRect();
@@ -213,9 +204,9 @@ const main = async () => {
       );
       if (image) {
         const target = parseInt(hitboxId.split("-")[1], 10);
-        if (state.cavity === null) {
+        if (state.state === "select-cavity") {
           drawImg({ ...image, tint: { color: "#F00000", alpha: 0.3 } });
-          state.cavity = target;
+          state = { state: "select-tooth", cavity: target, selected: null };
         } else if (
           target < state.cavity &&
           (state.selected == null || state.selected > target)
@@ -225,11 +216,25 @@ const main = async () => {
             const image = scaledImagesWithImagesWithCanvases.find(
               ({ id }) => id === `tooth-${i}`
             );
-            console.log(image);
             if (image) {
               drawImg({ ...image, clear: true });
             }
           }
+        }
+      }
+      const instructionsContent = document.getElementById(
+        "instructions-content"
+      );
+      if (!instructionsContent) {
+        throw new Error("Instructions content area not found");
+      }
+      switch (state.state) {
+        case "select-cavity": {
+          instructionsContent.textContent = "Select the tooth with the cavity!";
+        }
+        case "select-tooth": {
+          instructionsContent.textContent =
+            "Select the currently played tooth!";
         }
       }
     }
