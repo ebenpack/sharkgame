@@ -129,12 +129,13 @@ const main = async () => {
           pxlCtx.drawImage(img, left, top, width, height);
           const imgd = pxlCtx.getImageData(0, 0, actualWidth, actualHeight);
           var pix = imgd.data;
-          for (let i = 0; i < pix.length; i += 4) {
-            const x = Math.round((i / 4) % actualWidth);
-            const y = Math.round(i / 4 / actualHeight);
-            const alpha = pix[i + 3];
-            if (alpha > 20) {
-              hitboxes.hitboxes[`${x}-${y}`] = id;
+          for (let x = 0; x < actualWidth; x++) {
+            for (let y = 0; y < actualHeight; y++) {
+              const index = (y * actualWidth + x) * 4;
+              const alpha = pix[index + 3];
+              if (alpha > 1) {
+                hitboxes.hitboxes[`${x}-${y}`] = id;
+              }
             }
           }
         }
@@ -154,7 +155,7 @@ const main = async () => {
     canvas.style.position = "absolute";
     canvas.style.top = "0";
     canvas.style.left = "0";
-    canvas.style.background = " transparent";
+    canvas.style.background = "transparent";
     canvas.width = actualWidth;
     canvas.height = actualHeight;
     const ctx = canvas.getContext("2d");
@@ -212,8 +213,8 @@ const main = async () => {
 
   canvasContainer.addEventListener("click", (e) => {
     const canvasRect = canvasContainer.getBoundingClientRect();
-    const x = Math.floor(e.clientX - canvasRect.left);
-    const y = Math.floor(e.clientY - canvasRect.top);
+    const x = Math.floor(e.offsetX);
+    const y = Math.floor(e.offsetY);
     const hitboxId = hitboxes.hitboxes[`${x}-${y}`];
     if (hitboxId) {
       const image = scaledImagesWithImagesWithCanvases.find(
@@ -266,6 +267,33 @@ const main = async () => {
       }
     }
   });
+
+  const _drawHitboxen = () => {
+    const canvas = document.createElement("canvas");
+    canvas.style.position = "absolute";
+    canvas.style.top = "0";
+    canvas.style.left = "0";
+    canvas.style.background = "transparent";
+    canvas.width = actualWidth;
+    canvas.height = actualHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("Something wonky with this context yo");
+    }
+    ctx.imageSmoothingEnabled = false;
+    const img = ctx.getImageData(0, 0, actualWidth, actualHeight);
+    const { data } = img;
+    for (const hitboxId in hitboxes.hitboxes) {
+      const [x, y] = hitboxId.split("-");
+      const index = parseInt(y, 10) * actualWidth + parseInt(x, 10);
+      console.log({ x, y, index });
+      data[index * 4] = 255;
+      data[index * 4 + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    canvasContainer.appendChild(canvas);
+  };
+
   // Add a reset button
 };
 
