@@ -16,13 +16,33 @@ self["webpackHotUpdatesharkgame"]("main",{
 
 throw new Error("Module build failed: Error: ENOENT: no such file or directory, open '/Users/ebenpack/Downloads/sharkgame/node_modules/ansi-html-community/index.js'");
 
+/***/ }),
+
+/***/ "./node_modules/events/events.js":
+/*!***************************************!*\
+  !*** ./node_modules/events/events.js ***!
+  \***************************************/
+/***/ (() => {
+
+throw new Error("Module build failed: Error: ENOENT: no such file or directory, open '/Users/ebenpack/Downloads/sharkgame/node_modules/events/events.js'");
+
+/***/ }),
+
+/***/ "./node_modules/html-entities/lib/index.js":
+/*!*************************************************!*\
+  !*** ./node_modules/html-entities/lib/index.js ***!
+  \*************************************************/
+/***/ (() => {
+
+throw new Error("Module build failed: Error: ENOENT: no such file or directory, open '/Users/ebenpack/Downloads/sharkgame/node_modules/html-entities/lib/index.js'");
+
 /***/ })
 
 },
 /******/ function(__webpack_require__) { // webpackRuntimeModules
 /******/ /* webpack/runtime/getFullHash */
 /******/ (() => {
-/******/ 	__webpack_require__.h = () => ("4774b65d6f59d5bc32bb")
+/******/ 	__webpack_require__.h = () => ("212f136d2b8f4107ebd6")
 /******/ })();
 /******/ 
 /******/ }
