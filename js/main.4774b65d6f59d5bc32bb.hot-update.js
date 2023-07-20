@@ -1,3 +1,4 @@
+"use strict";
 /*
  * ATTENTION: An "eval-source-map" devtool has been used.
  * This devtool is neither made for production nor for readable output files.
@@ -6,23 +7,11 @@
  * or disable the default devtool with "devtool: false".
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
-self["webpackHotUpdatesharkgame"]("main",{
-
-/***/ "./node_modules/ansi-html-community/index.js":
-/*!***************************************************!*\
-  !*** ./node_modules/ansi-html-community/index.js ***!
-  \***************************************************/
-/***/ (() => {
-
-throw new Error("Module build failed: Error: ENOENT: no such file or directory, open '/Users/ebenpack/Downloads/sharkgame/node_modules/ansi-html-community/index.js'");
-
-/***/ })
-
-},
+self["webpackHotUpdatesharkgame"]("main",{},
 /******/ function(__webpack_require__) { // webpackRuntimeModules
 /******/ /* webpack/runtime/getFullHash */
 /******/ (() => {
-/******/ 	__webpack_require__.h = () => ("0cff2a72164a59c8dc9d")
+/******/ 	__webpack_require__.h = () => ("0498f0843201f5c9cb5a")
 /******/ })();
 /******/ 
 /******/ }
