@@ -1,3 +1,5 @@
+import { cli } from "webpack-dev-server";
+
 type Image = {
   id: string;
   src: string;
@@ -31,12 +33,13 @@ const solve = (cavity: number, remaining: number): Solution => {
   // (or modulus, for the math nerds), as well as keeping the quotient handy.
   // (18-1)/4 is 4 with a remainder of 1. This remainder is important,
   // but so is the quotient, so keep 1 and 4 in mind.
-  debugger;
   const target = remaining - cavity - 1;
   const rem = target % 4;
   const quot = Math.floor((target - 1) / 4);
   return { rem, quot };
 };
+
+const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 const main = async () => {
   const scale = 1.5;
@@ -215,74 +218,102 @@ const main = async () => {
   };
   type State = SelectCavity | SelectTooth | Win;
   let state: State = { state: "select-cavity" };
+  const clickLock: { lock: null | Promise<void> } = { lock: null };
 
-  canvasContainer.addEventListener("click", (e) => {
-    const canvasRect = canvasContainer.getBoundingClientRect();
-    const x = Math.floor(e.offsetX);
-    const y = Math.floor(e.offsetY);
-    const hitboxId = hitboxes.hitboxes[`${x}-${y}`];
-    if (hitboxId) {
-      const image = scaledImagesWithImagesWithCanvases.find(
-        ({ id }) => id === hitboxId
-      );
-      if (image) {
-        const target = parseInt(hitboxId.split("-")[1], 10);
-        if (state.state === "select-cavity") {
-          drawImg({ ...image, tint: { color: "#F00000", alpha: 0.3 } });
-          state = { state: "select-tooth", cavity: target, selected: null };
-        } else if (
-          target < state.cavity &&
-          (state.selected == null || state.selected < target)
-        ) {
-          // Hide all teeth up to this one
-          for (let i = 1; i <= target; i++) {
-            const image = scaledImagesWithImagesWithCanvases.find(
-              ({ id }) => id === `tooth-${i}`
-            );
-            if (image) {
-              drawImg({ ...image, clear: true });
+  const resetButton = document.getElementById("reset");
+  if (!resetButton) {
+    throw new Error("Reset button not found");
+  }
+  resetButton.addEventListener("click", async () => {
+    if (clickLock.lock) {
+      await clickLock.lock;
+    }
+    state = { state: "select-cavity" };
+    scaledImagesWithImagesWithCanvases
+      .filter((i) => i.id.startsWith("tooth"))
+      .map(drawImg);
+  });
+
+  canvasContainer.addEventListener("click", async (e) => {
+    if (clickLock.lock !== null) {
+      return;
+    }
+    clickLock.lock = new Promise(async (res) => {
+      const canvasRect = canvasContainer.getBoundingClientRect();
+      const x = Math.floor(e.offsetX);
+      const y = Math.floor(e.offsetY);
+      const hitboxId = hitboxes.hitboxes[`${x}-${y}`];
+      if (hitboxId) {
+        const image = scaledImagesWithImagesWithCanvases.find(
+          ({ id }) => id === hitboxId
+        );
+        if (image) {
+          const target = parseInt(hitboxId.split("-")[1], 10);
+          if (state.state === "select-cavity") {
+            drawImg({ ...image, tint: { color: "#F00000", alpha: 0.3 } });
+            state = { state: "select-tooth", cavity: target, selected: null };
+          } else if (
+            target < state.cavity &&
+            (state.selected == null || state.selected < target)
+          ) {
+            // Hide all teeth up to this one
+            for (let i = 1; i <= target; i++) {
+              const image = scaledImagesWithImagesWithCanvases.find(
+                ({ id }) => id === `tooth-${i}`
+              );
+              if (image) {
+                drawImg({ ...image, clear: true });
+                await sleep(150);
+              }
+            }
+            if (target + 1 === state.cavity) {
+              state = {
+                state: "win",
+                cavity: state.cavity,
+                selected: target,
+              };
+            } else {
+              state = {
+                state: "select-tooth",
+                cavity: state.cavity,
+                selected: target,
+              };
             }
           }
-          if (target + 1 === state.cavity) {
-            state = {
-              state: "win",
-              cavity: state.cavity,
-              selected: target,
-            };
-          } else {
-            state = {
-              state: "select-tooth",
-              cavity: state.cavity,
-              selected: target,
-            };
+        }
+        const instructionsContent = document.getElementById(
+          "instructions-content"
+        );
+        if (!instructionsContent) {
+          throw new Error("Instructions content area not found");
+        }
+        switch (state.state) {
+          case "select-cavity": {
+            instructionsContent.textContent =
+              "Select the tooth with the cavity!";
+            break;
+          }
+          case "select-tooth": {
+            // TODO: Try to always count from the same side.
+            const { rem } = solve(
+              21 - state.cavity,
+              21 - (state.selected || 0)
+            );
+            instructionsContent.textContent = `Select the currently played tooth!\nIf it's your turn, then play ${
+              rem || 1
+            }!`;
+            break;
+          }
+          case "win": {
+            instructionsContent.textContent = `If it's your turn, then you've won!`;
+            break;
           }
         }
       }
-      const instructionsContent = document.getElementById(
-        "instructions-content"
-      );
-      if (!instructionsContent) {
-        throw new Error("Instructions content area not found");
-      }
-      switch (state.state) {
-        case "select-cavity": {
-          instructionsContent.textContent = "Select the tooth with the cavity!";
-          break;
-        }
-        case "select-tooth": {
-          // TODO: Try to always count from the same side.
-          const { rem } = solve(21 - state.cavity, 21 - (state.selected || 0));
-          instructionsContent.textContent = `Select the currently played tooth!\nIf it's your turn, then play ${
-            rem || 1
-          }!`;
-          break;
-        }
-        case "win": {
-          instructionsContent.textContent = `If it's your turn, then you've won!`;
-          break;
-        }
-      }
-    }
+      res();
+    });
+    await clickLock.lock;
+    clickLock.lock = null;
   });
 
   const _drawHitboxen = () => {
