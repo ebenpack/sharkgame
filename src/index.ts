@@ -257,7 +257,7 @@ const main = async () => {
             (state.selected == null || state.selected < target)
           ) {
             // Hide all teeth up to this one
-            for (let i = 1; i <= target; i++) {
+            for (let i = state.selected ?? 1; i <= target; i++) {
               const image = scaledImagesWithImagesWithCanvases.find(
                 ({ id }) => id === `tooth-${i}`
               );
