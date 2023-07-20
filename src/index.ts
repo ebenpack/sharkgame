@@ -334,7 +334,6 @@ const main = async () => {
     for (const hitboxId in hitboxes.hitboxes) {
       const [x, y] = hitboxId.split("-");
       const index = parseInt(y, 10) * actualWidth + parseInt(x, 10);
-      console.log({ x, y, index });
       data[index * 4] = 255;
       data[index * 4 + 3] = 255;
     }
@@ -342,7 +341,10 @@ const main = async () => {
     canvasContainer.appendChild(canvas);
   };
 
-  // Add a reset button
+  // TODO:
+  // Fix instructions pane height
+  // Improve instructions copy
+  // Responsivize
 };
 
 main();
