@@ -220,10 +220,36 @@ const main = async () => {
   let state: State = { state: "select-cavity" };
   const clickLock: { lock: null | Promise<void> } = { lock: null };
 
+  const setInstructions = () => {
+    const instructionsContent = document.getElementById("instructions-content");
+    if (!instructionsContent) {
+      throw new Error("Instructions content area not found");
+    }
+    switch (state.state) {
+      case "select-cavity": {
+        instructionsContent.textContent = "Select the tooth with the cavity!";
+        break;
+      }
+      case "select-tooth": {
+        // TODO: Try to always count from the same side.
+        const { rem } = solve(21 - state.cavity, 21 - (state.selected || 0));
+        instructionsContent.textContent = `Select the currently played tooth!\nIf it's your turn, then play ${
+          rem || 1
+        }!`;
+        break;
+      }
+      case "win": {
+        instructionsContent.textContent = `If it's your turn, then you've won!`;
+        break;
+      }
+    }
+  };
+
   const resetButton = document.getElementById("reset");
   if (!resetButton) {
     throw new Error("Reset button not found");
   }
+
   resetButton.addEventListener("click", async () => {
     if (clickLock.lock) {
       await clickLock.lock;
@@ -232,6 +258,7 @@ const main = async () => {
     scaledImagesWithImagesWithCanvases
       .filter((i) => i.id.startsWith("tooth"))
       .map(drawImg);
+    setInstructions();
   });
 
   canvasContainer.addEventListener("click", async (e) => {
@@ -281,34 +308,7 @@ const main = async () => {
             }
           }
         }
-        const instructionsContent = document.getElementById(
-          "instructions-content"
-        );
-        if (!instructionsContent) {
-          throw new Error("Instructions content area not found");
-        }
-        switch (state.state) {
-          case "select-cavity": {
-            instructionsContent.textContent =
-              "Select the tooth with the cavity!";
-            break;
-          }
-          case "select-tooth": {
-            // TODO: Try to always count from the same side.
-            const { rem } = solve(
-              21 - state.cavity,
-              21 - (state.selected || 0)
-            );
-            instructionsContent.textContent = `Select the currently played tooth!\nIf it's your turn, then play ${
-              rem || 1
-            }!`;
-            break;
-          }
-          case "win": {
-            instructionsContent.textContent = `If it's your turn, then you've won!`;
-            break;
-          }
-        }
+        setInstructions();
       }
       res();
     });
