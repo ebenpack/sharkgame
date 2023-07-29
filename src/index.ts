@@ -1,5 +1,3 @@
-import { cli } from "webpack-dev-server";
-
 type Image = {
   id: string;
   src: string;
@@ -75,7 +73,7 @@ const main = async () => {
       left: 0,
       top: 0,
     },
-    { id: "shark", src: "shark.png", width: 392, left: 30, top: 30 },
+    { id: "shark", src: "shark.png", width: 396, left: 30, top: 28 },
     ...[...Array(20)].map((_, index) => {
       const i = index + 1;
       return {
