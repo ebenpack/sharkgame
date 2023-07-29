@@ -37,57 +37,65 @@
         margin: 0;
         padding:0;
       }
-    </style>
-  </head>
-
-  <body>
-    <div
-      style="
+      .main-container {
         padding-top: 20px;
-        display: flex;
+        display: grid;
+        grid-template:
+          "a b";
         justify-content: center;
         align-items: center;
         align-content: center;
         gap: 20px;
         height: 100%;
-      "
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      class="main-container"
     >
       <!-- TODO: Responsive-ize -->
       <!-- TODO: Maybe grid? The instructions box changes height a bit currently -->
-      <div id="shark-game" style="position: relative; flex: 0 0 auto;"></div>
+      <div id="shark-game" style="position: relative; flex: 0 0 auto; grid-area: a;"></div>
       <div 
         style="
-          flex-basis: 30%;
-          flex: 0 0 auto;
+          grid-area: b;
+          height: 100%;
           display: flex;
           flex-direction: column;
-        "
-      >
-      <div
-        style="
           color: #098ca8;
           text-shadow: -3px 2px 0px rgba(188,245,124,0.6);
           font-size: 25px;
-          padding:40px;
-          background-color:white; 
-          flex-wrap: wrap;
           background: rgb(157,252,252);
           background: linear-gradient(180deg, rgba(157,252,252,1) 35%, rgba(81,196,251,1) 100%);
         "
       >
-      <h2>Oh hey, what do I do?</h2>
-      <p style="white-space: pre-wrap; " id="instructions-content">Select the tooth with the cavity!</p>
-      </div>
+      <div
+        style="
+          margin: auto 0;
+          padding:40px;
+          align-self: center;
+          flex-wrap: wrap;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        "
+      >
+      <h2 style="margin: 0;">Oh hey, what do I do?</h2>
+      <p style="white-space: pre-wrap; margin: 0;" id="instructions-content">Select the tooth with the cavity!</p>
       <button 
         style="
           align-self: end;
           background: transparent;
           border: none;
           cursor: pointer;
+          margin-left: auto;
         " id="reset"
       >
         <img style=" margin-top: 10px; width: 40px; background-color: black; border: 4px solid white;" src="images/reset.png" alt="Reset" />
       </button>
+      </div>
       </div>
     </div>
     <script src="js/main.js""></script>
